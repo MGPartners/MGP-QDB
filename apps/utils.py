@@ -41,13 +41,13 @@ def create_question_form(question_type: str):
     question = st.text_area("Question", key=f"question_text_area")
     if question_type == "writing":
         question_point = st.text_area("Question Point", key="question_point_text_area").split("\n")
-        etc = None
+        underlined= None
     elif question_type == "summarizing":
         question_point = None
-        etc = None
+        underlined= None
     elif question_type == "emailing":
         question_point = None
-        etc = st.text_area("Etc", key="question_etc_text_area")
+        underlined= st.text_area("underlined", key="question_etc_text_area")
     else:
         raise ValueError("Invalid question type")
     col1, col2 = st.columns(2)
@@ -56,7 +56,7 @@ def create_question_form(question_type: str):
     return {
         "question": question,
         "question_point": question_point,
-        "etc": etc,
+        "underlined": underlined,
         "min_words": min_words,
         "max_words": max_words
     }
@@ -82,7 +82,7 @@ def rander_question_preview(question_type, question_dict) -> None:
                 {question_dict["question"]}
     """)
     st.markdown(f"""- {'\n- '.join(question_dict["question_point"])}""") if question_dict["question_point"] else None
-    st.markdown(f"""- {question_dict["etc"]}""") if question_dict["etc"] else None
+    st.markdown(f"""- {question_dict["underlined"]}""") if question_dict["underlined"] else None
     st.markdown("""---""")
 
 def rander_question_form(uid: str) -> None:
@@ -96,7 +96,7 @@ def rander_question_form(uid: str) -> None:
             "id": docs_id,
             "question": question_dict["question"],
             "question_point": question_dict["question_point"],
-            "etc": question_dict["etc"],
+            "underlined": question_dict["underlined"],
             "min_words": int(question_dict["min_words"]),
             "max_words": int(question_dict["max_words"]),
             "subject": subject,
