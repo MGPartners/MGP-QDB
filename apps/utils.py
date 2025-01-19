@@ -5,7 +5,8 @@ from .configs.mappings import Mappings, SystemMapping, QuestionMapping
 
 def generate_id(subject: str, level: str, question_type: str, user_type: str, uid: str) -> str:
         date = datetime.datetime.now().strftime("%Y%m%d")
-        return f"{subject}-{level}-{question_type}-{user_type}-{uid.split('@')[0]}-{date}-{getrandbits(16)}"
+        random_bits = getrandbits(16)
+        return f"{subject}-{level}-{question_type}-{user_type}-{uid.split('@')[0]}-{date}-{random_bits}"
 
 def init() -> None:
     st.markdown(
@@ -61,7 +62,7 @@ def create_question_form(question_type: str):
         "max_words": max_words
     }
 
-def rander_question_preview(question_type, question_dict) -> None:
+def render_question_preview(question_type, question_dict) -> None:
     if question_type == "writing":
         topic = QuestionMapping.writing
     elif question_type == "summarizing":
@@ -85,11 +86,11 @@ def rander_question_preview(question_type, question_dict) -> None:
     st.markdown(f"""- {question_dict["underlined"]}""") if question_dict["underlined"] else None
     st.markdown("""---""")
 
-def rander_question_form(uid: str) -> None:
+def render_question_form(uid: str) -> None:
     subject, level, question_type, user_type = mapping_data(uid)
     docs_id = generate_id(subject, level, question_type, user_type, uid)
     question_dict = create_question_form(question_type)
-    rander_question_preview(question_type, question_dict)
+    render_question_preview(question_type, question_dict)
 
     if st.button("Submit"):
         data = {
