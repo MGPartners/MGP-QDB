@@ -8,4 +8,4 @@ logged_in, uid = authenticate.login()
 if logged_in:
     utils.init()
 
-    utils.rander_question_form(uid)
+    utils.render_question_form(uid)
