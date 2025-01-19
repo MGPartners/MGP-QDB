@@ -1,7 +1,7 @@
 import streamlit as st
 from apps import authenticate, utils
 
-api_endpoint = "https://mgp-qdb-922713694655.asia-northeast2.run.app/"
+api_endpoint = "https://mgp-qdb.asia-northeast2.run.app/"
 
 st.title("MG Partners Question Database")
 
