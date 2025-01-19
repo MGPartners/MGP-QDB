@@ -5,13 +5,6 @@ EXPOSE 8080
 RUN pip install poetry
 WORKDIR /usr/src/app
 
-# Create the .streamlit directory
-RUN mkdir -p .streamlit
-
-# Write the secret from the build argument to secrets.toml
-ARG STREAMLIT_SECRETS
-RUN echo "$STREAMLIT_SECRETS" > .streamlit/secrets.toml
-
 COPY ./ /usr/src/app
 RUN poetry install
 
