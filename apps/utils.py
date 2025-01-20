@@ -1,5 +1,6 @@
 import streamlit as st
 import datetime
+import requests
 from random import getrandbits
 from .configs.mappings import Mappings, SystemMapping, QuestionMapping
 
@@ -108,10 +109,10 @@ def render_question_form(uid: str) -> None:
             "user_type": user_type
         }
         st.markdown(data)
-        # response = requests.post(f"{SystemMapping.api_endpoints}/add_question", json=data)
-        # if response.status_code == 200:
-        #     st.markdown("Question added successfully")
-        # else:
-        #     st.markdown("Error adding question") 
+        response = requests.post(f"{SystemMapping.api_endpoints}/add_question", json=data)
+        if response.status_code == 200:
+            st.markdown("Question added successfully")
+        else:
+            st.markdown("Error adding question") 
         st.markdown(f"""#### Submitted successfully. Question ID is below: 
                     {docs_id}""")

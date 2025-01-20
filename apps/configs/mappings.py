@@ -1,5 +1,5 @@
 class SystemMapping:
-    api_endpoints: str = "http://192.168.77.84:8000"
+    api_endpoints: str = "https://mgpta-api-922713694655.asia-northeast1.run.app"
 
 class QuestionMapping:
     summarizing : str = "以下の英文を読んで，その内容を**英語で要約**し，解答欄に記入しなさい。"
