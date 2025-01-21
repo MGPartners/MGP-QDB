@@ -2,14 +2,14 @@ class SystemMapping:
     api_endpoints: str = "https://mgpta-api-922713694655.asia-northeast1.run.app"
 
 class QuestionMapping:
-    summarizing : str = "以下の英文を読んで，その内容を**英語で要約**し，解答欄に記入しなさい。"
-    writing : str = "以下の TOPIC について，あなたの意見とその理由を2つ書きなさい。\n- POINTS は理由を書く際の参考となる観点を示したものです。ただし，これら以外の観点から理由を書いてもかまいません。"
-    emailing : str = "あなたは，外国人の知り合い（Alex）から，Ｅメールで質問を受け取りました。この質問にわかりやすく答える返信メールを英文で書きなさい。"
+    summarize : str = "以下の英文を読んで，その内容を**英語で要約**し，解答欄に記入しなさい。"
+    composition : str = "以下の TOPIC について，あなたの意見とその理**由を2つ**書きなさい。\n- POINTS は理由を書く際の参考となる観点を示したものです。ただし，これら以外の観点から理由を書いてもかまいません。"
+    e_mail : str = "あなたは，外国人の知り合い（Alex）から，Ｅメールで質問を受け取りました。この質問にわかりやすく答える返信メールを英文で書きなさい。"
     number_of_words : str = "語数の目安は{min_words}語～{max_words}語です。"
-    Warning_summarizing : str = "解答が英文の要約になっていないと判断された場合は，**0点と採点されることがあります。** 英文をよく読んでから答えてください。"
-    Warning_writing : str = "解答が TOPIC に示された問いの答えになっていない場合や，TOPIC からずれて いると判断された場合は，**0点と採点されることがあります。** TOPIC の内容をよく 読んでから答えてください"
-    Warning_emailing : str = "解答が質問に対する返信になっていない場合や，質問に対する答えが不十分だと判断された場合は，**0点と採点されることがあります。** 質問の内容をよく読んでから答えてください。\n-  の下の Best wishes, の後にあなたの名前を書く必要はありません。"
-    emailing_addition : str = "あなたが書く返信メールの中で，Alex のＥメール文中の下線部について，あなたがより理解を深めるために，下線部の特徴を問う具体的な質問を2つしなさい。"
+    Warning_summarize : str = "解答が英文の要約になっていないと判断された場合は，**0点と採点されることがあります。** 英文をよく読んでから答えてください。"
+    Warning_composition : str = "解答が TOPIC に示された問いの答えになっていない場合や，TOPIC からずれて いると判断された場合は，**0点と採点されることがあります。** TOPIC の内容をよく 読んでから答えてください"
+    Warning_e_mail : str = "解答が質問に対する返信になっていない場合や，質問に対する答えが不十分だと判断された場合は，**0点と採点されることがあります。** 質問の内容をよく読んでから答えてください。\n-  の下の Best wishes, の後にあなたの名前を書く必要はありません。"
+    e_mail_addition : str = "あなたが書く返信メールの中で，Alex のＥメール文中の下線部について，あなたがより理解を深めるために，下線部の特徴を問う具体的な質問を2つしなさい。"
 
 class Mappings:
     def __init__(self):
@@ -28,9 +28,9 @@ class Mappings:
         self.inverse_level_map = {v: k for k, v in self.level_map.items()}
 
         self.question_type_map = {
-            "英作文": "writing",
-            "英文要約": "summarizing",
-            "Ｅメール": "emailing"
+            "英作文": "composition",
+            "英文要約": "summarize",
+            "Ｅメール": "e_mail"
         }
         self.inverse_question_type_map = {v: k for k, v in self.question_type_map.items()}
 
