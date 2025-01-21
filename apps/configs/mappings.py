@@ -18,14 +18,14 @@ class Mappings:
         }
         self.inverse_subject_map = {v: k for k, v in self.subject_map.items()}
 
-        self.level_map = {
+        self.grade_map = {
             "３級": "3",
             "準２級": "pre2",
             "２級": "2",
             "準１級": "pre1",
             "１級": "1"
         }
-        self.inverse_level_map = {v: k for k, v in self.level_map.items()}
+        self.inverse_grade_map = {v: k for k, v in self.grade_map.items()}
 
         self.question_type_map = {
             "英作文": "composition",
@@ -43,7 +43,7 @@ class Mappings:
     def get_mappings(self) -> dict:
         return {
             "subject_map": self.subject_map,
-            "level_map": self.level_map,
+            "grade_map": self.grade_map,
             "question_type_map": self.question_type_map,
             "user_type_map": self.user_type_map
     }
@@ -51,7 +51,7 @@ class Mappings:
     def get_inverse_mappings(self) -> dict:
         return {
             "inverse_subject_map": self.inverse_subject_map,
-            "inverse_level_map": self.inverse_level_map,
+            "inverse_grade_map": self.inverse_grade_map,
             "inverse_question_type_map": self.inverse_question_type_map,
             "inverse_user_type_map": self.inverse_user_type_map
         }

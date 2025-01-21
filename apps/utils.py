@@ -3,11 +3,13 @@ import datetime
 import requests
 from random import getrandbits
 from .configs.mappings import Mappings, SystemMapping, QuestionMapping
+from pydantic import BaseModel
+from typing import Optional, List
 
-def generate_id(subject: str, level: str, question_type: str, user_type: str, uid: str) -> str:
+def generate_id(subject: str, grade: str, question_type: str, user_type: str, uid: str) -> str:
         date = datetime.datetime.now().strftime("%Y%m%d")
         random_bits = getrandbits(16)
-        return f"{subject}-{level}-{question_type}-{user_type}-{uid.split('@')[0]}-{date}-{random_bits}"
+        return f"{subject}-{grade}-{question_type}-{user_type}-{uid.split('@')[0]}-{date}-{random_bits}"
 
 def init() -> None:
     st.markdown(
@@ -23,17 +25,17 @@ def init() -> None:
 def render_sidebar(uid: str) -> tuple:
     st.sidebar.text(f"User ID: {uid}")
     subject = st.sidebar.selectbox("Subject", ["英検"])
-    level = st.sidebar.selectbox("Level", ["３級", "準２級", "２級", "準１級", "１級"])
+    grade = st.sidebar.selectbox("Grade", ["３級", "準２級", "２級", "準１級", "１級"])
     question_type = st.sidebar.selectbox("Question type", ["英作文", "英文要約", "Ｅメール"])
     user_type = st.sidebar.selectbox("User type", ["Teacher", "Student"])
-    return subject, level, question_type, user_type
+    return subject, grade, question_type, user_type
 
 def mapping_data(uid: str) -> tuple:
-    subject, level, question_type, user_type = render_sidebar(uid)
+    subject, grade, question_type, user_type = render_sidebar(uid)
     mappings = Mappings().get_mappings()
     return (
         mappings["subject_map"][subject],
-        mappings["level_map"][level],
+        mappings["grade_map"][grade],
         mappings["question_type_map"][question_type],
         mappings["user_type_map"][user_type]
     )
@@ -42,12 +44,16 @@ def create_question_form(question_type: str):
     question = st.text_area("QUESTION", key=f"question_text_area")
     if question_type == "composition":
         additional = st.text_area("POINT", key="additional_text_area").split("\n")
+        if additional[0] == '':
+            additional = None
         underlined= None
     elif question_type == "summarize":
         additional = None
         underlined = None
     elif question_type == "e_mail":
         additional = st.text_area("Additional instruction", key="ask_it")
+        if additional[0] == '':
+            additional = None
         underlined= st.text_input("Underlined", key="question_etc_input")
     else:
         raise ValueError("Invalid question type")
@@ -63,7 +69,7 @@ def create_question_form(question_type: str):
     }
 
 def POINT_CHECKER(additional):
-    if len(additional) > 1:
+    if additional:
         st.markdown("""##### POINTS""")
         st.markdown(f"""- {'\n- '.join(additional)}""")
 
@@ -92,21 +98,35 @@ def render_question_preview(question_type, question_dict) -> None:
     st.markdown(f"""- {question_dict["underlined"]}""") if question_dict["underlined"] else None
     st.markdown("""---""")
 
-def submit_question_form(docs_id, question_dict, subject, level, question_type, uid, user_type) -> None:
-    data = {
-    "id": docs_id,
-    "question": question_dict["question"],
-    "additional": question_dict["additional"],
-    "underlined": question_dict["underlined"],
-    "min_words": int(question_dict["min_words"]),
-    "max_words": int(question_dict["max_words"]),
-    "subject": subject,
-    "level": level,
-    "question_type": question_type,
-    "created_at": datetime.datetime.now(tz=datetime.timezone.utc).timestamp(),
-    "created_by": uid,
-    "user_type": user_type
-    }
+def submit_question_form(docs_id, question_dict, subject, grade, question_type, uid, user_type) -> None:
+    class QuestionData(BaseModel):
+        id: str
+        question: str
+        additional: Optional[List[str]] = None
+        underlined: Optional[str] = None
+        min_words: int
+        max_words: int
+        subject: str
+        grade: str
+        question_type: str
+        created_at: float
+        created_by: str
+        user_type: str
+
+    data = QuestionData(
+        id=docs_id,
+        question=question_dict["question"],
+        additional=question_dict["additional"],
+        underlined=question_dict["underlined"],
+        min_words=int(question_dict["min_words"]),
+        max_words=int(question_dict["max_words"]),
+        subject=subject,
+        grade=grade,
+        question_type=question_type,
+        created_at=datetime.datetime.now(tz=datetime.timezone.utc).timestamp(),
+        created_by=uid,
+        user_type=user_type
+    ).dict()
     st.markdown(data)
     response = requests.post(f"{SystemMapping.api_endpoints}/add_question", json=data)
     if response.status_code == 200:
@@ -119,12 +139,12 @@ def submit_question_form(docs_id, question_dict, subject, level, question_type, 
     st.markdown("""---""")    
 
 def render_question_form(uid: str) -> None:
-    subject, level, question_type, user_type = mapping_data(uid)
-    docs_id = generate_id(subject, level, question_type, user_type, uid)
+    subject, grade, question_type, user_type = mapping_data(uid)
+    docs_id = generate_id(subject, grade, question_type, user_type, uid)
     question_dict = create_question_form(question_type)
     render_question_preview(question_type, question_dict)
 
     if st.button("Submit"):
-        submit_question_form(docs_id, question_dict, subject, level, question_type, uid, user_type)
+        submit_question_form(docs_id, question_dict, subject, grade, question_type, uid, user_type)
 
 
