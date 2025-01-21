@@ -51,9 +51,7 @@ def create_question_form(question_type: str):
         additional = None
         underlined = None
     elif question_type == "e_mail":
-        additional = st.text_area("Additional instruction", key="ask_it")
-        if additional[0] == '':
-            additional = None
+        additional = st.text_input("Email to", key="ask_it")
         underlined= st.text_input("Underlined", key="question_etc_input")
     else:
         raise ValueError("Invalid question type")
@@ -73,29 +71,24 @@ def POINT_CHECKER(additional):
         st.markdown("""##### POINTS""")
         st.markdown(f"""- {'\n- '.join(additional)}""")
 
-def render_question_preview(question_type, question_dict) -> None:
-    if question_type == "composition":
-        topic = QuestionMapping.composition
-    elif question_type == "summarize":
-        topic = QuestionMapping.summarize
-    elif question_type == "e_mail":
-        topic = QuestionMapping.e_mail
-
-    st.markdown(topic)
+def render_question_preview_base(topic, question_dict) -> None:
     st.markdown("""---""")
     st.markdown("""#### Preview""")
     st.markdown(f"""- {topic}""")
     st.markdown(f"""- {QuestionMapping.number_of_words.format(min_words = question_dict['min_words'],
                                                          max_words = question_dict['max_words'])}""")
-    st.markdown(f"""- {QuestionMapping.Warning_summarize}""")
-    st.markdown("""---""")
-    st.markdown("""##### QUESTION""")
-    st.markdown(f"""
-                {question_dict["question"].replace(question_dict["underlined"], 
-                f"<u>{question_dict['underlined']}</u>") if question_type == "e_mail" else question_dict["question"]}
-    """, unsafe_allow_html=True)
-    POINT_CHECKER(question_dict["additional"])
-    st.markdown(f"""- {question_dict["underlined"]}""") if question_dict["underlined"] else None
+
+def render_question_preview(question_type, question_dict) -> None:
+    if question_type == "composition":
+        render_question_preview_base(QuestionMapping.composition, question_dict)
+        POINT_CHECKER(question_dict["additional"])
+    elif question_type == "summarize":
+        render_question_preview_base(QuestionMapping.summarize, question_dict)
+        st.markdown(f"""- {QuestionMapping.Warning_summarize}""")
+    elif question_type == "e_mail":
+        topic = QuestionMapping.e_mail.format(additional = question_dict["additional"])
+        render_question_preview_base(topic, question_dict)
+        st.markdown(f"""- {question_dict["underlined"]}""") if question_dict["underlined"] else None
     st.markdown("""---""")
 
 def submit_question_form(docs_id, question_dict, subject, grade, question_type, uid, user_type) -> None:
@@ -135,7 +128,6 @@ def submit_question_form(docs_id, question_dict, subject, grade, question_type, 
             {docs_id}""")
     else:
         st.markdown(f"Error adding question, status code: {response.status_code}") 
-
     st.markdown("""---""")    
 
 def render_question_form(uid: str) -> None:
