@@ -1,6 +1,3 @@
-class SystemMapping:
-    api_endpoints: str = "https://mgpta-api-922713694655.asia-northeast1.run.app"
-
 class QuestionMapping:
     summarize : str = "以下の英文を読んで，その内容を**英語で要約**し，解答欄に記入しなさい。"
     composition : str = "以下の TOPIC について，あなたの意見とその理**由を2つ**書きなさい。\n- POINTS は理由を書く際の参考となる観点を示したものです。ただし，これら以外の観点から理由を書いてもかまいません。"

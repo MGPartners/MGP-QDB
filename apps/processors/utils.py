@@ -1,19 +1,19 @@
 import streamlit as st
 import datetime
-import requests
+import httpx
 from random import getrandbits
-from .configs.mappings import Mappings, SystemMapping, QuestionMapping
-from pydantic import BaseModel
-from typing import Optional, List
+from app_configs import mappings, api_settings
+from io_schema import request_models
+
 
 def generate_id(subject: str, grade: str, question_type: str, user_type: str, uid: str) -> str:
-        date = datetime.datetime.now().strftime("%Y%m%d")
-        random_bits = getrandbits(16)
+        date = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        random_bits = getrandbits(8)
         return f"{subject}-{grade}-{question_type}-{user_type}-{uid.split('@')[0]}-{date}-{random_bits}"
 
 def init() -> None:
     st.markdown(
-        r"""
+        """
         <style>
         .stAppDeployButton {
                 visibility: hidden;
@@ -28,20 +28,22 @@ def render_sidebar(uid: str) -> tuple:
     grade = st.sidebar.selectbox("Grade", ["３級", "準２級", "２級", "準１級", "１級"])
     question_type = st.sidebar.selectbox("Question type", ["英作文", "英文要約", "Ｅメール"])
     user_type = st.sidebar.selectbox("User type", ["Teacher", "Student"])
-    return subject, grade, question_type, user_type
+    official = st.sidebar.checkbox("Official", value=False)
+    return subject, grade, question_type, user_type, official
 
 def mapping_data(uid: str) -> tuple:
-    subject, grade, question_type, user_type = render_sidebar(uid)
-    mappings = Mappings().get_mappings()
+    subject, grade, question_type, user_type, official = render_sidebar(uid)
+    data_map = mappings.Mappings().get_mappings()
     return (
-        mappings["subject_map"][subject],
-        mappings["grade_map"][grade],
-        mappings["question_type_map"][question_type],
-        mappings["user_type_map"][user_type]
+        data_map["subject_map"][subject],
+        data_map["grade_map"][grade],
+        data_map["question_type_map"][question_type],
+        data_map["user_type_map"][user_type],
+        official,
     )
 
 def create_question_form(question_type: str):
-    question = st.text_area("QUESTION", key=f"question_text_area")
+    question = st.text_area("QUESTION", key="question_text_area")
     if question_type == "composition":
         additional = st.text_area("POINT", key="additional_text_area").split("\n")
         if additional[0] == '':
@@ -75,68 +77,62 @@ def render_question_preview_base(topic, question_dict) -> None:
     st.markdown("""---""")
     st.markdown("""#### Preview""")
     st.markdown(f"""- {topic}""")
-    st.markdown(f"""- {QuestionMapping.number_of_words.format(min_words = question_dict['min_words'],
+    st.markdown(f"""- {mappings.QuestionMapping.number_of_words.format(min_words = question_dict['min_words'],
                                                          max_words = question_dict['max_words'])}""")
 
 def render_question_preview(question_type, question_dict) -> None:
     if question_type == "composition":
-        render_question_preview_base(QuestionMapping.composition, question_dict)
+        render_question_preview_base(mappings.QuestionMapping.composition, question_dict)
         POINT_CHECKER(question_dict["additional"])
     elif question_type == "summarize":
-        render_question_preview_base(QuestionMapping.summarize, question_dict)
-        st.markdown(f"""- {QuestionMapping.Warning_summarize}""")
+        render_question_preview_base(mappings.QuestionMapping.summarize, question_dict)
+        st.markdown(f"""- {mappings.QuestionMapping.Warning_summarize}""")
     elif question_type == "e_mail":
-        topic = QuestionMapping.e_mail.format(additional = question_dict["additional"])
+        topic = mappings.QuestionMapping.e_mail.format(additional = question_dict["additional"])
         render_question_preview_base(topic, question_dict)
         st.markdown(f"""- {question_dict["underlined"]}""") if question_dict["underlined"] else None
     st.markdown("""---""")
 
-def submit_question_form(docs_id, question_dict, subject, grade, question_type, uid, user_type) -> None:
-    class QuestionData(BaseModel):
-        id: str
-        question: str
-        additional: Optional[List[str]] = None
-        underlined: Optional[str] = None
-        min_words: int
-        max_words: int
-        subject: str
-        grade: str
-        question_type: str
-        created_at: float
-        created_by: str
-        user_type: str
-
-    data = QuestionData(
-        id=docs_id,
-        question=question_dict["question"],
-        additional=question_dict["additional"],
-        underlined=question_dict["underlined"],
+def submit_question_form(docs_id, question_dict, subject, grade, question_type, uid, user_type, official) -> None:
+    data = request_models.QuestionData(
+        additional_instructions=question_dict["additional"],
+        grade=grade,
         min_words=int(question_dict["min_words"]),
         max_words=int(question_dict["max_words"]),
-        subject=subject,
-        grade=grade,
+        question=question_dict["question"],
         question_type=question_type,
-        created_at=datetime.datetime.now(tz=datetime.timezone.utc).timestamp(),
+        subject=subject,
+        underlined=question_dict["underlined"],
+        question_id=docs_id,
         created_by=uid,
-        user_type=user_type
-    ).dict()
-    st.markdown(data)
-    response = requests.post(f"{SystemMapping.api_endpoints}/add_question", json=data)
+        created_at=int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp()),
+        user_type=user_type,
+        data_name="eiken_questions",
+        official=official,
+    ).model_dump()
+    
+    client = httpx.Client()
+    response = client.post(f"{api_settings.api_endpoints.local_endpoint}/add_question", json=data)
     if response.status_code == 200:
         st.markdown("Question added successfully")
         st.markdown(f"""#### Submitted successfully. Question ID is below: 
             {docs_id}""")
     else:
-        st.markdown(f"Error adding question, status code: {response.status_code}") 
+        st.markdown(f"Error adding question, status code: {response.status_code}")
+        st.markdown(f"Response details: {response.text}")
     st.markdown("""---""")    
 
+
 def render_question_form(uid: str) -> None:
-    subject, grade, question_type, user_type = mapping_data(uid)
+    subject, grade, question_type, user_type, official = mapping_data(uid)
     docs_id = generate_id(subject, grade, question_type, user_type, uid)
     question_dict = create_question_form(question_type)
+    if not question_dict:
+        st.stop()
+
     render_question_preview(question_type, question_dict)
 
     if st.button("Submit"):
-        submit_question_form(docs_id, question_dict, subject, grade, question_type, uid, user_type)
+        submit_question_form(docs_id, question_dict, subject, grade, question_type, uid, user_type, official)
 
 
