@@ -7,4 +7,4 @@ WORKDIR /usr/src/app
 
 COPY ./ /usr/src/app
 
-CMD ["uv", "run", "streamlit", "run", "main.py", "--server.port=8080", "--server.address=0.0.0.0"]
+# CMD ["uv", "run", "streamlit", "run", "main.py", "--server.port=8080", "--server.address=0.0.0.0"]
