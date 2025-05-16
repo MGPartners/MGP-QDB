@@ -111,8 +111,8 @@ def submit_question_form(docs_id, question_dict, subject, grade, question_type, 
         official=official,
     ).model_dump()
     
-    client = httpx.Client()
-    response = client.post(f"{api_settings.api_endpoints.local_endpoint}/add_question", json=data)
+    client = httpx.Client(timeout=60)
+    response = client.post(f"{api_settings.api_endpoints.main_endpoint}/add_question", json=data)
     if response.status_code == 200:
         st.markdown("Question added successfully")
         st.markdown(f"""#### Submitted successfully. Question ID is below: 
