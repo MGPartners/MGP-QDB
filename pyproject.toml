@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "miraibo_api"
 version = "0.2.0"
-description = ""
+description = "A lightweight API for managing and interacting with Miraibo services."
 authors = ["Eli Lee Kitagawa <cosmosart@msn.com>"]
 readme = "README.md"
 package-mode = false
