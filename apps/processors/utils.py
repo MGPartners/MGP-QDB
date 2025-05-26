@@ -88,7 +88,7 @@ def render_question_preview(question_type, question_dict) -> None:
         render_question_preview_base(mappings.QuestionMapping.summarize, question_dict)
         st.markdown(f"""- {mappings.QuestionMapping.Warning_summarize}""")
     elif question_type == "e_mail":
-        topic = mappings.QuestionMapping.e_mail.format(additional = question_dict["additional"])
+        topic = mappings.QuestionMapping.e_mail.format(additional = question_dict["additional"][0])
         render_question_preview_base(topic, question_dict)
         st.markdown(f"""- {question_dict["underlined"]}""") if question_dict["underlined"] else None
     st.markdown("""---""")
