@@ -53,8 +53,8 @@ def create_question_form(question_type: str):
         additional = None
         underlined = None
     elif question_type == "e_mail":
-        additional = st.text_input("Email to", key="ask_it")
-        underlined= st.text_input("Underlined", key="question_etc_input")
+        additional = [st.text_input("Email to", key="ask_it")]
+        underlined = st.text_input("Underlined", key="question_etc_input")
     else:
         raise ValueError("Invalid question type")
     col1, col2 = st.columns(2)

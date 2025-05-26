@@ -11,7 +11,8 @@ st.markdown("# Search Questions")
 if main.logged_in:
     from main import uid
 
-    api_endpoint = api_settings.api_endpoints.local_endpoint if getenv("ENVIRONMENT_TYPE") == "dev" else api_settings.api_endpoints.main_endpoint
+    api_endpoint = api_settings.api_endpoints.local_endpoint if getenv("ENVIRONMENT_TYPE") == "dev" \
+                    else api_settings.api_endpoints.main_endpoint
 
     def render_sidebar(uid: str) -> tuple:
         st.sidebar.text(f"User ID: {uid}")
