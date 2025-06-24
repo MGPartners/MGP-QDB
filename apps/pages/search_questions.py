@@ -2,15 +2,11 @@ import streamlit as st
 import httpx
 from app_configs import mappings, api_settings
 from os import getenv
-import main
-from importlib import reload
-reload(main)
 
 st.markdown("# Search Questions")
 
-if main.logged_in:
-    from main import uid
-
+if st.session_state.get("logged_in"):
+    uid = st.session_state.uid
     api_endpoint = api_settings.api_endpoints.local_endpoint if getenv("ENVIRONMENT_TYPE") == "dev" \
                     else api_settings.api_endpoints.main_endpoint
 
@@ -53,6 +49,8 @@ if main.logged_in:
                 else:
                     st.error("No questions found.")
     main(uid)
+else:
+    st.warning("Please log in to access this page.")
 
 
 

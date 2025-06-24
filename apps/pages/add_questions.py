@@ -1,10 +1,10 @@
 import streamlit as st
 from processors import utils
-import main
 
 st.markdown("# Add Questions")
 
-if main.logged_in:
+if st.session_state.get("logged_in"):
     utils.init()
-    from main import uid
-    utils.render_question_form(uid)
+    utils.render_question_form(st.session_state.uid)
+else:
+    st.warning("Please log in to access this page.")
