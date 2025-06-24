@@ -23,7 +23,7 @@ if st.session_state.get("logged_in"):
             else:
                 st.error("Question not found.")
     elif search_type == "Keyword":
-        grade = st.selectbox("Grade", ["３級", "準２級", "２級", "準１級", "１級"])
+        grade = st.selectbox("Grade", ["３級", "準２級", "準2級プラス", "２級", "準１級", "１級"])
         question_type = st.selectbox("Question type", ["英作文", "英文要約", "Ｅメール"])
         data_map = mappings.Mappings().get_mappings()
         grade = data_map["grade_map"][grade]
@@ -41,7 +41,7 @@ if st.session_state.get("logged_in"):
     st.markdown("---")
     delete_id = st.text_input("Enter Question ID to Delete", key="delete_id")
     if st.button("Delete Question") and delete_id:
-        response = httpx.post(f"{api_endpoint}/delete_question", json={"question_id": delete_id})
+        response = httpx.post(f"{api_endpoint}/delete_question", params={"question_id": delete_id})
         if response.status_code == 200:
             st.success(f"Question {delete_id} deleted successfully.")
         else:

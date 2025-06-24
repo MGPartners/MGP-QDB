@@ -1,5 +1,6 @@
 import streamlit as st
 from processors import authenticate
+from os import getenv
 
 
 def show_login_page():
@@ -13,6 +14,13 @@ def main():
         st.session_state.logged_in = False
         st.session_state.uid = None
         st.session_state.name = None
+
+    # Bypass login if ENVIRONMENT_TYPE is 'dev'
+    if getenv("ENVIRONMENT_TYPE") == "dev":
+        st.session_state.logged_in = True
+        st.session_state.uid = "mgpartners@gracekyoto.com"
+        st.session_state.name = "mgpartners"
+        return
 
     if not st.session_state.logged_in:
         logged_in, uid, name = authenticate.login()

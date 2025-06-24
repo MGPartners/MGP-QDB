@@ -20,24 +20,50 @@ if st.session_state.get("logged_in"):
         st.markdown(f"## Search type: {search_type}")
         if search_type == "ID":
             question_id = st.text_input("Question ID", key="question_id")
+            show_json = st.checkbox("Show as JSON", key="show_json_id")
             if st.button("Search"):
                 response = httpx.get(api_endpoint + "/show_question/" + question_id)
                 if response.status_code == 200:
                     question_data = response.json()
-                    st.json(question_data)
+                    qid = question_data.get('question_id', question_id)
+                    st.markdown(f"**Question ID:** `{qid}`")
+                    st.markdown(f"**Question:** {question_data.get('question', '')}")
+                    st.markdown(f"**Additional:** {'; '.join(question_data.get('additional_instructions', [])) if question_data.get('additional_instructions') else ''}")
+                    st.markdown(f"**Underlined:** {question_data.get('underlined', '')}")
+                    st.markdown(f"**Min Words:** {question_data.get('min_words', '')}")
+                    st.markdown(f"**Max Words:** {question_data.get('max_words', '')}")
+                    if show_json:
+                        import json
+                        st.code(json.dumps(question_data, ensure_ascii=False, indent=2), language="json")
                 else:
                     st.error("Question not found.")
         elif search_type == "Keyword":
-            grade = st.selectbox("Grade", ["３級", "準２級", "２級", "準１級", "１級"])
+            grade = st.selectbox("Grade", ["３級", "準２級", "準2級プラス", "２級", "準１級", "１級"])
             question_type = st.selectbox("Question type", ["英作文", "英文要約", "Ｅメール"])
             data_map = mappings.Mappings().get_mappings()
             grade = data_map["grade_map"][grade]
             question_type = data_map["question_type_map"][question_type]
+            show_json = st.checkbox("Show as JSON", key="show_json_keyword")
             if st.button("Search"):
                 response = httpx.get(f"{api_endpoint}/show_questions?grade={grade}&question_type={question_type}")
                 if response.status_code == 200:
                     questions = response.json()
-                    st.write(questions)
+                    if questions:
+                        for qid, qdata in questions.items():
+                            st.markdown("---")
+                            st.markdown(f"**Question ID:** `{qid}`")
+                            st.markdown(f"**Question:** {qdata.get('question', '')}")
+                            st.markdown(f"**Additional:** {'; '.join(qdata.get('additional_instructions', [])) if qdata.get('additional_instructions') else ''}")
+                            st.markdown(f"**Underlined:** {qdata.get('underlined', '')}")
+                            st.markdown(f"**Min Words:** {qdata.get('min_words', '')}")
+                            st.markdown(f"**Max Words:** {qdata.get('max_words', '')}")
+                            if show_json:
+                                import json
+                                st.markdown('```json')
+                                st.markdown(json.dumps(qdata, ensure_ascii=False, indent=2))
+                                st.markdown('```')
+                    else:
+                        st.info("No questions found.")
                 else:
                     st.error("No questions found.")
         elif search_type == "All":
@@ -45,7 +71,28 @@ if st.session_state.get("logged_in"):
                 response = httpx.get(api_endpoint + "/list_all_questions")
                 if response.status_code == 200:
                     questions = response.json()
-                    st.write(questions)
+                    if questions:
+                        # Count by grade and question_type
+                        from collections import defaultdict
+                        import pandas as pd
+                        count_dict = defaultdict(lambda: defaultdict(int))
+                        for q in questions:
+                            grade = q.get('grade', 'N/A')
+                            qtype = q.get('question_type', 'N/A')
+                            count_dict[grade][qtype] += 1
+                        # Prepare data for DataFrame
+                        rows = []
+                        for grade, qtype_dict in count_dict.items():
+                            for qtype, count in qtype_dict.items():
+                                rows.append({'Grade': grade, 'Question Type': qtype, 'Count': count})
+                        df = pd.DataFrame(rows)
+                        if not df.empty:
+                            df = df.sort_values(['Grade', 'Question Type'])
+                            st.dataframe(df, hide_index=True)
+                        else:
+                            st.info("No questions found.")
+                    else:
+                        st.info("No questions found.")
                 else:
                     st.error("No questions found.")
     main(uid)
