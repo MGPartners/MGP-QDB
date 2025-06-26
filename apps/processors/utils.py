@@ -53,12 +53,12 @@ def create_question_form(question_type: str):
     if question_type == "composition":
         additional_instructions = [pt for pt in st.text_area("POINT", key="additional_text_area").split("\n") if pt.strip()]
     elif question_type == "e_mail":
-        additional_instructions = [st.text_input("Email to", key="ask_it")]
-        underlined = st.text_input("Underlined", key="question_etc_input")
+        additional_instructions = ""
+        underlined = st.text_area("Underlined", key="question_etc_input")
     # For summary, both fields remain empty
     col1, col2 = st.columns(2)
-    min_words = col1.number_input("Min Words", min_value=20, max_value=200, value=40, key="input_min_words")
-    max_words = col2.number_input("Max Words", min_value=20, max_value=200, value=60, key="input_max_words")
+    min_words = col1.number_input("Min Words", min_value=15, max_value=200, value=40, key="input_min_words")
+    max_words = col2.number_input("Max Words", min_value=15, max_value=200, value=60, key="input_max_words")
     return {
         "question": question,
         "additional_instructions": additional_instructions,
