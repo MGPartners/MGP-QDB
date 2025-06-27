@@ -45,7 +45,7 @@ if st.session_state.get("logged_in"):
             question_type = data_map["question_type_map"][question_type]
             show_json = st.checkbox("Show as JSON", key="show_json_keyword")
             if st.button("Search"):
-                response = httpx.get(f"{api_endpoint}/show_questions?grade={grade}&question_type={question_type}")
+                response = httpx.get(f"{api_endpoint}/show_questions?exam_grade={grade}&question_type={question_type}")
                 if response.status_code == 200:
                     questions = response.json()
                     if questions:
