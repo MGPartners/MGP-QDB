@@ -53,7 +53,7 @@ def create_question_form(question_type: str):
     if question_type == "composition":
         additional_instructions = [pt for pt in st.text_area("POINT", key="additional_text_area").split("\n") if pt.strip()]
     elif question_type == "e_mail":
-        additional_instructions = [st.text_input("Email to", key="ask_it")]
+        additional_instructions = ""
         underlined = st.text_area("Underlined", key="question_etc_input")
     # For summary, both fields remain empty
     col1, col2 = st.columns(2)
