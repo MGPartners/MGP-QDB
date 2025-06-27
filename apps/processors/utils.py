@@ -53,7 +53,7 @@ def create_question_form(question_type: str):
     if question_type == "composition":
         additional_instructions = [pt for pt in st.text_area("POINT", key="additional_text_area").split("\n") if pt.strip()]
     elif question_type == "e_mail":
-        additional_instructions = ""
+        additional_instructions = [st.text_input("Email to", key="ask_it")]
         underlined = st.text_area("Underlined", key="question_etc_input")
     # For summary, both fields remain empty
     col1, col2 = st.columns(2)
@@ -88,7 +88,9 @@ def render_question_preview(question_type, question_dict) -> None:
         render_question_preview_base(mappings.QuestionMapping.summary, question_dict)
         st.markdown(f"- {mappings.QuestionMapping.Warning_summary}")
     elif question_type == "e_mail":
-        topic = mappings.QuestionMapping.e_mail.format(additional=question_dict["additional_instructions"][0])
+        topic = mappings.QuestionMapping.e_mail.format(
+            additional=question_dict["additional_instructions"][0] if question_dict["additional_instructions"] else ""
+        )
         render_question_preview_base(topic, question_dict)
         if question_dict["underlined"]:
             st.markdown(f"- {question_dict['underlined']}")
