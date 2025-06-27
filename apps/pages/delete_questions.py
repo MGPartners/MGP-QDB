@@ -29,7 +29,7 @@ if st.session_state.get("logged_in"):
         grade = data_map["grade_map"][grade]
         question_type = data_map["question_type_map"][question_type]
         if st.button("Search by Keyword"):
-            response = httpx.get(f"{api_endpoint}/show_questions?grade={grade}&question_type={question_type}")
+            response = httpx.get(f"{api_endpoint}/show_questions?exam_grade={grade}&question_type={question_type}")
             if response.status_code == 200 and response.json():
                 questions = response.json()
                 for qid, qdata in questions.items():
