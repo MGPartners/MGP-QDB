@@ -99,7 +99,7 @@ def render_question_preview(question_type, question_dict) -> None:
 def submit_question_form(docs_id, question_dict, subject, grade, question_type, uid, user_type, official) -> None:
     data = request_models.QuestionData(
         additional_instructions=question_dict["additional_instructions"],
-        grade=grade,
+        exam_grade=grade,
         min_words=int(question_dict["min_words"]),
         max_words=int(question_dict["max_words"]),
         question=question_dict["question"],
