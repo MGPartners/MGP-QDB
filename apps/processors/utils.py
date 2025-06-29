@@ -93,7 +93,9 @@ def render_question_preview(question_type, question_dict) -> None:
         )
         render_question_preview_base(topic, question_dict)
         if question_dict["underlined"]:
-            st.markdown(f"- {question_dict['underlined']}")
+            st.markdown(f'### Underlined')
+            for line in question_dict['underlined'].split('\n'):
+                st.markdown(f"- {line}")
     st.markdown("---")
 
 def submit_question_form(docs_id, question_dict, subject, grade, question_type, uid, user_type, official) -> None:
