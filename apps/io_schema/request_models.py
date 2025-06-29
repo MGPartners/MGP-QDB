@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 class QuestionData(BaseModel):
     additional_instructions: list[str] | None = None
-    grade: str
+    exam_grade: str
     max_words: int
     min_words: int
     question: str
