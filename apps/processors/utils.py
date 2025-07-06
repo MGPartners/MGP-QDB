@@ -52,7 +52,7 @@ def create_question_form(question_type: str):
     underlined = ""
     if question_type == "composition":
         additional_instructions = [pt for pt in st.text_area("POINT", key="additional_text_area").split("\n") if pt.strip()]
-    elif question_type == "e_mail":
+    elif question_type == "email":
         additional_instructions = [st.text_input("Email to", key="ask_it")]
         underlined = st.text_area("Underlined", key="question_etc_input")
     # For summary, both fields remain empty
@@ -87,15 +87,13 @@ def render_question_preview(question_type, question_dict) -> None:
     elif question_type == "summary":
         render_question_preview_base(mappings.QuestionMapping.summary, question_dict)
         st.markdown(f"- {mappings.QuestionMapping.Warning_summary}")
-    elif question_type == "e_mail":
+    elif question_type == "email":
         topic = mappings.QuestionMapping.e_mail.format(
             additional=question_dict["additional_instructions"][0] if question_dict["additional_instructions"] else ""
         )
         render_question_preview_base(topic, question_dict)
         if question_dict["underlined"]:
-            st.markdown(f'### Underlined')
-            for line in question_dict['underlined'].split('\n'):
-                st.markdown(f"- {line}")
+            st.markdown(f"- {question_dict['underlined']}")
     st.markdown("---")
 
 def submit_question_form(docs_id, question_dict, subject, exam_grade, question_type, uid, user_type, official) -> None:

@@ -39,10 +39,11 @@ if st.session_state.get("logged_in"):
                     st.error("Question not found.")
         elif search_type == "Keyword":
             exam_grade = st.selectbox("Grade", ["３級", "準２級", "準2級プラス", "２級", "準１級", "１級"])
-            question_type = st.selectbox("Question type", ["英作文", "英文要約", "Ｅメール"])
+            question_type = st.selectbox("Question type", ["英作文", "英文要約", "Email"])
             data_map = mappings.Mappings().get_mappings()
             exam_grade = data_map["grade_map"][exam_grade]
-            question_type = data_map["question_type_map"][question_type]
+            # Map 'Email' to 'email' for backend
+            question_type = 'email' if question_type == 'Email' else data_map["question_type_map"][question_type]
             show_json = st.checkbox("Show as JSON", key="show_json_keyword")
             if st.button("Search"):
                 response = httpx.get(f"{api_endpoint}/show_questions?exam_grade={exam_grade}&question_type={question_type}")

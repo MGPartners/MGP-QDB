@@ -28,7 +28,7 @@ class Mappings:
         self.question_type_map = {
             "英作文": "composition",
             "英文要約": "summary",
-            "Ｅメール": "e_mail"
+            "Email": "email"
         }
         self.inverse_question_type_map = {v: k for k, v in self.question_type_map.items()}
 
