@@ -27,7 +27,8 @@ if st.session_state.get("logged_in"):
         question_type = st.selectbox("Question type", ["英作文", "英文要約", "Ｅメール"])
         data_map = mappings.Mappings().get_mappings()
         exam_grade = data_map["grade_map"][exam_grade]
-        question_type = data_map["question_type_map"][question_type]
+        # Map 'Ｅメール' to 'email' for backend
+        question_type = 'email' if question_type == 'Ｅメール' else data_map["question_type_map"][question_type]
         if st.button("Search by Keyword"):
             response = httpx.get(
                 f"{api_endpoint}/show_questions",
