@@ -77,6 +77,8 @@ def render_question_preview_base(topic, question_dict) -> None:
     st.markdown("#### Preview")
     st.markdown(f"- {topic}")
     st.markdown(f"- {mappings.QuestionMapping.number_of_words.format(min_words=question_dict['min_words'], max_words=question_dict['max_words'])}")
+    st.markdown("#### Question")
+    st.markdown(question_dict.get('question', ''))
 
 def render_question_preview(question_type, question_dict) -> None:
     if question_type == "composition":
