@@ -22,7 +22,7 @@ if st.session_state.get("logged_in"):
             question_id = st.text_input("Question ID", key="question_id")
             show_json = st.checkbox("Show as JSON", key="show_json_id")
             if st.button("Search"):
-                response = httpx.get(api_endpoint + "/show_question/" + question_id)
+                response = httpx.get(api_endpoint + "/show_question/" + question_id, timeout=60)
                 if response.status_code == 200:
                     question_data = response.json()
                     qid = question_data.get('question_id', question_id)
@@ -46,7 +46,7 @@ if st.session_state.get("logged_in"):
             question_type = 'email' if question_type == 'Email' else data_map["question_type_map"][question_type]
             show_json = st.checkbox("Show as JSON", key="show_json_keyword")
             if st.button("Search"):
-                response = httpx.get(f"{api_endpoint}/show_questions?exam_grade={exam_grade}&question_type={question_type}")
+                response = httpx.get(f"{api_endpoint}/show_questions?exam_grade={exam_grade}&question_type={question_type}", timeout=30)
                 if response.status_code == 200:
                     questions = response.json()
                     if questions:
@@ -69,7 +69,7 @@ if st.session_state.get("logged_in"):
                     st.error("No questions found.")
         elif search_type == "All":
             if st.button("List all questions"):
-                response = httpx.get(api_endpoint + "/list_all_questions")
+                response = httpx.get(api_endpoint + "/list_all_questions", timeout=60)
                 if response.status_code == 200:
                     questions = response.json()
                     if questions:

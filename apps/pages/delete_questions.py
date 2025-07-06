@@ -17,7 +17,7 @@ if st.session_state.get("logged_in"):
     if search_type == "ID":
         question_id = st.text_input("Enter Question ID", key="delete_question_id")
         if st.button("Search by ID") and question_id:
-            response = httpx.get(f"{api_endpoint}/show_question/{question_id}")
+            response = httpx.get(f"{api_endpoint}/show_question/{question_id}", timeout=30)
             if response.status_code == 200 and response.json():
                 st.json(response.json())
             else:
@@ -29,7 +29,11 @@ if st.session_state.get("logged_in"):
         exam_grade = data_map["grade_map"][exam_grade]
         question_type = data_map["question_type_map"][question_type]
         if st.button("Search by Keyword"):
-            response = httpx.get(f"{api_endpoint}/show_questions?exam_grade={exam_grade}&question_type={question_type}")
+            response = httpx.get(
+                f"{api_endpoint}/show_questions",
+                params={"exam_grade": exam_grade, "question_type": question_type},
+                timeout=30
+            )
             if response.status_code == 200 and response.json():
                 questions = response.json()
                 for qid, qdata in questions.items():
