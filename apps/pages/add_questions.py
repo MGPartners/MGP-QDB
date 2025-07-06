@@ -22,10 +22,11 @@ if st.session_state.get("logged_in"):
     # Use unified form logic from utils
     question_dict = utils.create_question_form(question_type)
 
-    # Show the question text in the preview
+    # Show the question text in the preview, above points
     st.markdown("---")
     st.markdown("#### Preview")
     st.markdown(f"**Question:** {question_dict.get('question', '')}")
+    # Render the rest of the preview (points, etc.)
     utils.render_question_preview(question_type, question_dict)
 
     if st.button("Submit"):
