@@ -38,14 +38,14 @@ if st.session_state.get("logged_in"):
                 else:
                     st.error("Question not found.")
         elif search_type == "Keyword":
-            grade = st.selectbox("Grade", ["３級", "準２級", "準2級プラス", "２級", "準１級", "１級"])
+            exam_grade = st.selectbox("Grade", ["３級", "準２級", "準2級プラス", "２級", "準１級", "１級"])
             question_type = st.selectbox("Question type", ["英作文", "英文要約", "Ｅメール"])
             data_map = mappings.Mappings().get_mappings()
-            grade = data_map["grade_map"][grade]
+            exam_grade = data_map["grade_map"][exam_grade]
             question_type = data_map["question_type_map"][question_type]
             show_json = st.checkbox("Show as JSON", key="show_json_keyword")
             if st.button("Search"):
-                response = httpx.get(f"{api_endpoint}/show_questions?exam_grade={grade}&question_type={question_type}")
+                response = httpx.get(f"{api_endpoint}/show_questions?exam_grade={exam_grade}&question_type={question_type}")
                 if response.status_code == 200:
                     questions = response.json()
                     if questions:
@@ -72,19 +72,19 @@ if st.session_state.get("logged_in"):
                 if response.status_code == 200:
                     questions = response.json()
                     if questions:
-                        # Count by grade and question_type
+                        # Count by exam_grade and question_type
                         from collections import defaultdict
                         import pandas as pd
                         count_dict = defaultdict(lambda: defaultdict(int))
                         for q in questions:
-                            grade = q.get('grade', 'N/A')
+                            exam_grade = q.get('exam_grade', 'N/A')
                             qtype = q.get('question_type', 'N/A')
-                            count_dict[grade][qtype] += 1
+                            count_dict[exam_grade][qtype] += 1
                         # Prepare data for DataFrame
                         rows = []
-                        for grade, qtype_dict in count_dict.items():
+                        for exam_grade, qtype_dict in count_dict.items():
                             for qtype, count in qtype_dict.items():
-                                rows.append({'Grade': grade, 'Question Type': qtype, 'Count': count})
+                                rows.append({'Grade': exam_grade, 'Question Type': qtype, 'Count': count})
                         df = pd.DataFrame(rows)
                         if not df.empty:
                             df = df.sort_values(['Grade', 'Question Type'])
